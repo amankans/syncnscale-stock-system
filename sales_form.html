@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NV Stock | Sale Entry</title>
+
+    <style>
+
+        /* Base styles for the page */
+
+        body {
+
+            font-family: 'Segoe UI', sans-serif;
+
+            margin: 0;
+
+            padding: 0;
+
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+
+            color: white;
+
+            text-align: center;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+        }
+
+
+
+        .sale-container {
+
+            background-color: #1e293b;
+
+            padding: 30px;
+
+            border: 1px solid #eab308; /* Yellow/Gold for Sale */
+
+            width: 90%;
+
+            max-width: 500px;
+
+            border-radius: 10px;
+
+            color: white;
+
+            box-shadow: 0 10px 20px rgba(234, 179, 8, 0.5);
+
+            text-align: left;
+
+            margin: 20px;
+
+        }
+
+
+
+        .sale-container h2 {
+
+            color: #eab308;
+
+            margin-top: 0;
+
+        }
+
+       
+
+        input, select, textarea {
+
+            width: 100%;
+
+            padding: 10px;
+
+            margin-top: 5px;
+
+            margin-bottom: 15px;
+
+            border-radius: 5px;
+
+            border: 1px solid #475569;
+
+            background-color: #0f172a;
+
+            color: white;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        button {
+
+            width: 100%;
+
+            padding: 15px;
+
+            background-color: #eab308; /* Sale button color */
+
+            color: #1e293b;
+
+            border: none;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 1.1em;
+
+            font-weight: bold;
+
+            transition: background 0.3s;
+
+            margin-top: 10px;
+
+        }
+
+
+
+        button:hover {
+
+            background: #fcd34d;
+
+        }
+
+
+
+        #itemDetails {
+
+            background: #273447;
+
+            padding: 15px;
+
+            border-radius: 5px;
+
+            margin-bottom: 20px;
+
+            display: none; /* Hidden until IMEI is found */
+
+        }
+
+       
+
+        .status-error {
+
+            background: #ef4444; /* Red */
+
+            padding: 10px;
+
+            border-radius: 5px;
+
+            margin-bottom: 15px;
+
+        }
+
+       
+
+        .back-link {
+
+            display: inline-block;
+
+            margin-bottom: 20px;
+
+            color: #eab308;
+
+            text-decoration: none;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sale-container">
+
+        <a class="back-link" href="index.html">← Back to Dashboard</a>
+
+        <h2>💰 Add Sale Record</h2>
+
+
+
+        <label for="saleImei">IMEI Number:</label><br>
+
+        <input type="text" id="saleImei" required placeholder="Enter IMEI to check stock" maxlength="15">
+
+        <button onclick="checkImeiForSale()" style="background-color: #38bdf8; color: white; margin-top: 0;">Check Stock & Get Details</button>
+
+       
+
+        <div id="imeiFeedback" style="margin-top: 15px;"></div>
+
+
+
+        <div id="itemDetails">
+
+            <h4>Item Found (In Stock)</h4>
+
+            <p id="modelDisplay">Model: -</p>
+
+            <p id="purchasePriceDisplay">Purchase Price: -</p>
+
+            <hr>
+
+           
+
+            <label for="salePrice">Sale Price (₹):</label><br>
+
+            <input type="number" id="salePrice" required><br>
+
+
+
+            <label for="saleDate">Sale Date:</label><br>
+
+            <input type="date" id="saleDate"><br>
+
+           
+
+            <label for="customerName">Customer Name:</label><br>
+
+            <input type="text" id="customerName"><br>
+
+
+
+            <label for="customerPhone">Customer Phone:</label><br>
+
+            <input type="tel" id="customerPhone" pattern="[0-9]{10}" placeholder="10 digit number" maxlength="10"><br>
+
+           
+
+            <label for="saleAddress">Customer Address (Optional):</label><br>
+
+            <textarea id="saleAddress" rows="2"></textarea><br>
+
+
+
+            <button onclick="saveSale()" style="background-color: #eab308; color: #1e293b;">Complete & Save Sale</button>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // *** SIMULATED INVENTORY DATA (MOCK DATABASE) ***
+
+        // In your final Python/Flask system, this data will come from reading nvstock.db.
+
+        const inventoryData = [
+
+            { imei: '358703400123456', model: 'iPhone 13 Pro Max', status: 'In Stock', purchasePrice: 75000 },
+
+            { imei: '358703400123457', model: 'Galaxy S24 Ultra', status: 'Sold', purchasePrice: 80000 },
+
+            { imei: '358703400123458', model: 'OnePlus Nord CE 5G', status: 'In Stock', purchasePrice: 15000 },
+
+            { imei: '123456789012345', model: 'Mi 11 Lite', status: 'In Stock', purchasePrice: 12500 }
+
+        ];
+
+
+
+        let selectedItem = null;
+
+
+
+        function checkImeiForSale() {
+
+            const imei = document.getElementById('saleImei').value.trim();
+
+            const feedbackBox = document.getElementById('imeiFeedback');
+
+            const detailsBox = document.getElementById('itemDetails');
+
+
+
+            feedbackBox.innerHTML = '';
+
+            detailsBox.style.display = 'none';
+
+            detailsBox.className = '';
+
+            selectedItem = null;
+
+
+
+            if (imei.length !== 15) {
+
+                feedbackBox.className = 'status-error';
+
+                feedbackBox.innerHTML = '❌ Please enter a **15-digit IMEI** number.';
+
+                return;
+
+            }
+
+
+
+            const item = inventoryData.find(i => i.imei === imei);
+
+
+
+            if (item) {
+
+                if (item.status === 'In Stock') {
+
+                    // Item found and ready for sale
+
+                    selectedItem = item;
+
+                    feedbackBox.className = '';
+
+                    feedbackBox.innerHTML = '✅ **IMEI Found!** Item is In Stock.';
+
+                   
+
+                    document.getElementById('modelDisplay').textContent = `Model: ${item.model}`;
+
+                    document.getElementById('purchasePriceDisplay').textContent = `Purchase Price: ₹${item.purchasePrice.toLocaleString('en-IN')}`;
+
+                    document.getElementById('saleImei').disabled = true; // Lock IMEI field
+
+                   
+
+                    detailsBox.style.display = 'block';
+
+                    document.getElementById('customerName').focus();;
+
+
+
+                } else if (item.status === 'Sold') {
+
+                    // Item found but already sold
+
+                    feedbackBox.className = 'status-error';
+
+                    feedbackBox.innerHTML = `⚠️ WARNING: IMEI **${imei}** is already marked as **SOLD**.`;
+
+                }
+
+            } else {
+
+                // Item not found in database
+
+                feedbackBox.className = 'status-error';
+
+                feedbackBox.innerHTML = `❌ ERROR: IMEI **${imei}** is **NOT IN STOCK** (Not Purchased Yet).`;
+
+            }
+
+        }
+
+
+
+        function saveSale() {
+
+            if (!selectedItem) {
+
+                alert("Please check the IMEI first and ensure it is in stock.");
+
+                return;
+
+            }
+
+
+
+            const salePrice = document.getElementById('salePrice').value;
+
+            const saleDate = document.getElementById('saleDate').value;
+
+            const customerName = document.getElementById('customerName').value;
+
+            const customerPhone = document.getElementById('customerPhone').value;
+
+            const saleAddress = document.getElementById('saleAddress').value;
+
+
+
+            if (!salePrice || !saleDate || !customerName) {
+
+                alert("Sale Price, Date, and Customer Name are required to complete the sale.");
+
+                return;
+
+            }
+
+           
+
+            const purchasePrice = selectedItem.purchasePrice;
+
+            const profit = salePrice - purchasePrice;
+
+
+
+            // Simulated Save Alert
+
+            alert(
+
+                `🎉 Sale Successfully Recorded!\n\n` +
+
+                `Model: ${selectedItem.model}\nIMEI: ${selectedItem.imei}\n\n` +
+
+                `Sale Price: ₹${Number(salePrice).toLocaleString('en-IN')}\n` +
+
+                `Purchase Price: ₹${purchasePrice.toLocaleString('en-IN')}\n` +
+
+                `Profit/Loss: ₹${profit.toLocaleString('en-IN')} (${profit >= 0 ? 'Profit' : 'Loss'})\n\n` +
+
+                `Customer: ${customerName}\nPhone: ${customerPhone}\nDate: ${saleDate}`
+
+            );
+
+           
+
+            // Reset the form state for the next sale
+
+            document.getElementById('saleImei').disabled = false;
+
+            document.getElementById('saleImei').value = '';
+
+            document.getElementById('imeiFeedback').innerHTML = '';
+
+            document.getElementById('itemDetails').style.display = 'none';
+
+            selectedItem = null;
+
+           
+
+            // Clear sale-specific fields
+
+            document.getElementById('salePrice').value = '';
+
+            document.getElementById('saleDate').value = '';
+
+            document.getElementById('customerName').value = '';
+
+            document.getElementById('customerPhone').value = '';
+
+            document.getElementById('saleAddress').value = '';
+
+            document.getElementById('saleImei').focus();
+
+
+
+            // NOTE: In the next step (Python/Pandas), we will write the code to permanently save this data!
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NV Stock | Purchase Entry</title>
+    <style>
+        /* Base styles for the page (optional, but good practice) */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* -------------------- MODAL STYLES -------------------- */
+        /* Note: For this standalone file, the modal is displayed by default */
+        .modal {
+            display: flex; /* Show by default in this standalone file */
+            position: relative; /* Use relative positioning for standalone */
+            z-index: 10; 
+            width: 100%; 
+            height: 100%; 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e293b; 
+            padding: 30px;
+            border: 1px solid #0ea5e9;
+            width: 90%; 
+            max-width: 500px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            text-align: left;
+            margin: 20px; /* Add margin for spacing */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 15px;
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+
+        .modal-content button:hover {
+            background: #38bdf8;
+        }
+        /* ------------------ END MODAL STYLES ------------------ */
+    </style>
+
+</head>
+
+<body>
+
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add Purchase</h2>
+
+            <label>Purchase Source:</label><br>
+            <select id="purchaseSource" onchange="togglePurchaseDetails()">
+                <option value="">--Select Source--</option>
+                <option value="Cashify">Cashify</option>
+                <option value="Customer">Customer</option>
+                <option value="Known Person">Known Person</option>
+            </select><br><br>
+
+            <div id="cashifyDetails" style="display:none;">
+                <label>Invoice No.:</label><br>
+                <input type="text" id="invoiceNo" placeholder="e.g., CSH-20251105-001"><br><br>
+                
+                <label>Purchase Date:</label><br>
+                <input type="date" id="purchaseDate"><br><br>
+            </div>
+
+            <div id="customerDetails" style="display:none;">
+                <label>Customer Name:</label><br>
+                <input type="text" id="customerName"><br><br>
+
+                <label>Customer Phone:</label><br>
+                <input type="tel" id="customerPhone" pattern="[0-9]{10}" placeholder="10 digit number" maxlength="10"><br><br>
+                
+                <label>ID Card Details:</label><br>
+                <input type="text" id="idCardDetails" placeholder="Aadhaar, PAN, etc. details"><br><br>
+
+                <label>ID Card Image:</label><br>
+                <input type="file" id="idCardPic" accept="image/*"><br><br>
+            </div>
+
+            <div id="knownPersonField" style="display:none;">
+                <label>Known Person Name:</label><br>
+                <input type="text" id="knownName"><br><br>
+            </div>
+
+            <label>IMEI Number:</label><br>
+            <input type="text" id="imei" required><br><br>
+
+            <label>Phone Model:</label><br>
+            <input type="text" id="model" name="model" list="phone-models" required placeholder="Start typing model name..."><br><br>
+
+            <datalist id="phone-models">
+                <option value="Apple iPhone (1st gen)">
+                <option value="Apple iPhone 3G">
+                <option value="Apple iPhone 3GS">
+                <option value="Apple iPhone 4 (GSM)">
+                <option value="Apple iPhone 4 (CDMA)">
+                <option value="Apple iPhone 4S">
+                <option value="Apple iPhone 5">
+                <option value="Apple iPhone 5C">
+                <option value="Apple iPhone 5S">
+                <option value="Apple iPhone 6">
+                <option value="Apple iPhone 6 Plus">
+                <option value="Apple iPhone 6S">
+                <option value="Apple iPhone 6S Plus">
+                <option value="Apple iPhone SE (1st gen)">
+                <option value="Apple iPhone 7">
+                <option value="Apple iPhone 7 Plus">
+                <option value="Apple iPhone 8">
+                <option value="Apple iPhone 8 Plus">
+                <option value="Apple iPhone X">
+                <option value="Apple iPhone XR">
+                <option value="Apple iPhone XS">
+                <option value="Apple iPhone XS Max">
+                <option value="Apple iPhone 11">
+                <option value="Apple iPhone 11 Pro">
+                <option value="Apple iPhone 11 Pro Max">
+                <option value="Apple iPhone SE (2nd gen)">
+                <option value="Apple iPhone 12">
+                <option value="Apple iPhone 12 mini">
+                <option value="Apple iPhone 12 Pro">
+                <option value="Apple iPhone 12 Pro Max">
+                <option value="Apple iPhone 13">
+                <option value="Apple iPhone 13 mini">
+                <option value="Apple iPhone 13 Pro">
+                <option value="Apple iPhone 13 Pro Max">
+                <option value="Apple iPhone SE (3rd gen)">
+                <option value="Apple iPhone 14">
+                <option value="Apple iPhone 14 Plus">
+                <option value="Apple iPhone 14 Pro">
+                <option value="Apple iPhone 14 Pro Max">
+                <option value="Apple iPhone 15">
+                <option value="Apple iPhone 15 Plus">
+                <option value="Apple iPhone 15 Pro">
+                <option value="Apple iPhone 15 Pro Max">
+                <option value="Apple iPhone 16">
+                <option value="Apple iPhone 16 Plus">
+                <option value="Apple iPhone 16 Pro">
+                <option value="Apple iPhone 16 Pro Max">
+                <option value="Apple iPhone 16e">
+                <option value="Apple iPhone 17">
+                <option value="Apple iPhone 17 Pro">
+                <option value="Apple iPhone 17 Pro Max">
+                <option value="Apple iPhone Air">
+                <option value="CMF Phone 1">
+                <option value="CMF Phone 2 Pro">
+                <option value="Infinix Note 50s 5G+">
+                <option value="Intel AZ210">
+                <option value="iQOO 9">
+                <option value="iQOO 9 SE">
+                <option value="iQOO Z6 Lite 5G">
+                <option value="iQOO Neo9">
+                <option value="iQOO Neo10">
+                <option value="Motorola Cliq">
+                <option value="Motorola Droid">
+                <option value="Motorola Backflip">
+                <option value="Motorola Flipout">
+                <option value="Motorola Droid X">
+                <option value="Motorola Milestone XT720">
+                <option value="Motorola Charm">
+                <option value="Motorola Droid 2">
+                <option value="Motorola Defy">
+                <option value="Motorola Bravo">
+                <option value="Motorola Droid Pro">
+                <option value="Motorola Flipside">
+                <option value="Motorola Atrix 4G">
+                <option value="Motorola Droid 3">
+                <option value="Motorola Droid Bionic">
+                <option value="Motorola Atrix 2">
+                <option value="Motorola Droid Razr">
+                <option value="Motorola Droid 4">
+                <option value="Motorola Atrix HD">
+                <option value="Motorola Photon Q">
+                <option value="Motorola Droid Razr M">
+                <option value="Motorola Droid Razr HD">
+                <option value="Motorola Droid Maxx">
+                <option value="Motorola Droid Mini">
+                <option value="Motorola Moto X (1st generation)">
+                <option value="Motorola Moto G (1st generation)">
+                <option value="Motorola Moto E (1st generation)">
+                <option value="Motorola Moto G (2nd generation)">
+                <option value="Motorola Moto X (2nd generation)">
+                <option value="Motorola Droid Turbo">
+                <option value="Motorola Moto E (2nd generation)">
+                <option value="Motorola Moto G (3rd generation)">
+                <option value="Motorola Moto X Play">
+                <option value="Motorola Moto X Style">
+                <option value="Motorola Moto G4">
+                <option value="Motorola Moto E3">
+                <option value="Motorola Moto Z">
+                <option value="Motorola Moto Z Play">
+                <option value="Motorola Moto G5">
+                <option value="Motorola Moto C">
+                <option value="Motorola Moto E4">
+                <option value="Motorola Moto Z2 Play">
+                <option value="Motorola Moto Z2 Force">
+                <option value="Motorola Moto X4">
+                <option value="Motorola Moto E5">
+                <option value="Motorola Moto G6">
+                <option value="Motorola Moto Z3 Play">
+                <option value="Motorola Moto Z3">
+                <option value="Motorola One">
+                <option value="Motorola One Power">
+                <option value="Motorola Moto G7">
+                <option value="Motorola One Vision">
+                <option value="Motorola Moto Z4">
+                <option value="Motorola One Zoom">
+                <option value="Motorola Moto G8 Plus">
+                <option value="Motorola One Macro">
+                <option value="Motorola One Action">
+                <option value="Motorola Razr (4G)">
+                <option value="Motorola One Hyper">
+                <option value="Motorola Moto G8 Power">
+                <option value="Motorola Moto G Power">
+                <option value="Motorola Moto G Stylus">
+                <option value="Motorola Moto G8">
+                <option value="Motorola Moto E6s (2020)">
+                <option value="Motorola Moto G8 Power Lite">
+                <option value="Motorola Edge">
+                <option value="Motorola Edge+">
+                <option value="Motorola Moto G Pro">
+                <option value="Motorola Moto E (2020)">
+                <option value="Motorola Moto G Fast">
+                <option value="Motorola One Fusion+">
+                <option value="Motorola One Fusion">
+                <option value="Motorola Moto G 5G Plus">
+                <option value="Motorola Moto G9 Play">
+                <option value="Motorola Moto G9 Plus">
+                <option value="Motorola Moto E7 Plus">
+                <option value="Motorola Razr (5G)">
+                <option value="Motorola Moto G9 Power">
+                <option value="Motorola Moto G 5G">
+                <option value="Motorola Moto E7">
+                <option value="Motorola Moto G Play (2021)">
+                <option value="Motorola Moto G Power (2021)">
+                <option value="Motorola Moto G Stylus (2021)">
+                <option value="Motorola Moto E6i">
+                <option value="Motorola Moto E7 Power">
+                <option value="Motorola Moto G10">
+                <option value="Motorola Moto G30">
+                <option value="Motorola Moto G10 Power">
+                <option value="Motorola Moto G50">
+                <option value="Motorola Moto G100">
+                <option value="Motorola Moto G60">
+                <option value="Motorola Moto G40 Fusion">
+                <option value="Motorola Moto G20">
+                <option value="Motorola Moto G Stylus 5G">
+                <option value="Motorola Defy (2021)">
+                <option value="Motorola Moto G50 5G">
+                <option value="Motorola Moto G60S">
+                <option value="Motorola Edge 20">
+                <option value="Motorola Edge (2021)">
+                <option value="Nothing Phone 1">
+                <option value="Nothing Phone 2">
+                <option value="Nothing Phone 2a">
+                <option value="Nothing Phone 2a Plus">
+                <option value="Nothing Phone 3a">
+                <option value="Nothing Phone 3a Pro">
+                <option value="OnePlus One">
+                <option value="OnePlus 2">
+                <option value="OnePlus X">
+                <option value="OnePlus 3">
+                <option value="OnePlus 3T">
+                <option value="OnePlus 5">
+                <option value="OnePlus 5T">
+                <option value="OnePlus 6">
+                <option value="OnePlus 6T">
+                <option value="OnePlus 7">
+                <option value="OnePlus 7 Pro">
+                <option value="OnePlus 7T">
+                <option value="OnePlus 7T Pro">
+                <option value="OnePlus 8">
+                <option value="OnePlus 8 Pro">
+                <option value="OnePlus Nord">
+                <option value="OnePlus 8T">
+                <option value="OnePlus Nord N10 5G">
+                <option value="OnePlus Nord N100">
+                <option value="OnePlus 9">
+                <option value="OnePlus 9 Pro">
+                <option value="OnePlus Nord CE 5G">
+                <option value="OnePlus Nord N200 5G">
+                <option value="OnePlus Nord 2 5G">
+                <option value="OnePlus 10 Pro">
+                <option value="Oppo Finder">
+                <option value="Oppo Find 5">
+                <option value="Oppo N1">
+                <option value="Oppo Find 5 Mini">
+                <option value="Oppo Neo">
+                <option value="Oppo Find 7">
+                <option value="Oppo Find 7a">
+                <option value="Oppo Joy">
+                <option value="Oppo N1 mini">
+                <option value="Oppo Neo 3">
+                <option value="Oppo Neo 5">
+                <option value="Oppo N3">
+                <option value="Oppo Joy Plus">
+                <option value="Oppo Neo 5s">
+                <option value="Oppo R7">
+                <option value="Oppo Neo 5 (2015)">
+                <option value="Oppo Joy 3">
+                <option value="Oppo Neo 7">
+                <option value="Oppo F1">
+                <option value="Oppo R11">
+                <option value="Oppo F7">
+                <option value="Oppo R15 Pro">
+                <option value="Oppo Find X">
+                <option value="Oppo F9">
+                <option value="Oppo R17">
+                <option value="Oppo Reno">
+                <option value="Oppo Reno2">
+                <option value="Oppo A9 (2020)">
+                <option value="Oppo Reno3 5G">
+                <option value="Oppo Reno3 Pro 5G">
+                <option value="Oppo Reno3 Pro">
+                <option value="Oppo Find X2">
+                <option value="Oppo Find X2 Pro">
+                <option value="Oppo Reno3">
+                <option value="Oppo Ace2">
+                <option value="Oppo A12">
+                <option value="Oppo A52">
+                <option value="Oppo A72">
+                <option value="Oppo A92s">
+                <option value="Oppo Find X2 Lite">
+                <option value="Oppo Find X2 Neo">
+                <option value="Oppo A92">
+                <option value="Oppo Reno4 5G">
+                <option value="Oppo Reno4 Pro 5G">
+                <option value="Oppo A12s">
+                <option value="Oppo A72 5G">
+                <option value="Oppo Reno4">
+                <option value="Oppo Reno4 Pro">
+                <option value="Oppo F17">
+                <option value="Oppo F17 Pro">
+                <option value="Oppo Reno4 SE">
+                <option value="Oppo Reno4 Lite">
+                <option value="Oppo Reno4 Z 5G">
+                <option value="Oppo A93">
+                <option value="Oppo Reno4 F">
+                <option value="Oppo A73">
+                <option value="Oppo A73 5G">
+                <option value="Oppo Reno5 5G">
+                <option value="Oppo Reno5 Pro 5G">
+                <option value="Oppo Reno5 Pro+ 5G">
+                <option value="Oppo Reno5">
+                <option value="Oppo Find X3">
+                <option value="Oppo Find X3 Pro">
+                <option value="Oppo Find X3 Neo">
+                <option value="Oppo Find X3 Lite">
+                <option value="Oppo A94">
+                <option value="Oppo F19 Pro">
+                <option value="Oppo F19 Pro+">
+                <option value="Oppo Reno5 Lite">
+                <option value="Oppo Reno5 F">
+                <option value="Oppo Reno5 Z">
+                <option value="Oppo F19">
+                <option value="Oppo A35">
+                <option value="Oppo A94 5G">
+                <option value="Oppo A95 5G">
+                <option value="Oppo A54 5G">
+                <option value="Oppo A74 5G">
+                <option value="Oppo A74">
+                <option value="Oppo A53s 5G">
+                <option value="Oppo K9">
+                <option value="Oppo Reno6 5G">
+                <option value="Oppo Reno6 Pro">
+                <option value="Oppo Reno6 Pro+">
+                <option value="Oppo A16">
+                <option value="Oppo Reno6">
+                <option value="Oppo A16s">
+                <option value="Oppo Reno6 Z">
+                <option value="Oppo Reno6 Pro (Snapdragon)">
+                <option value="Oppo K9 Pro">
+                <option value="Oppo F19s">
+                <option value="Oppo A55">
+                <option value="Oppo K9s">
+                <option value="Oppo A56 5G">
+                <option value="Oppo A54s">
+                <option value="Oppo A16k">
+                <option value="Oppo A95">
+                <option value="Oppo Reno7 (China)">
+                <option value="Oppo Reno7 Pro">
+                <option value="Oppo Reno7 SE">
+                <option value="Oppo Find N">
+                <option value="Oppo K9x">
+                <option value="Oppo A11s">
+                <option value="Oppo A36">
+                <option value="Oppo A96 5G">
+                <option value="Oppo Reno6 Lite">
+                <option value="Oppo Reno7">
+                <option value="Oppo A76">
+                <option value="Oppo Find X5">
+                <option value="Oppo Find X5 Pro">
+                <option value="Oppo Find X5 Lite">
+                <option value="Oppo Reno7 Z">
+                <option value="Oppo A16e">
+                <option value="Oppo A96">
+                <option value="Oppo K10">
+                <option value="Oppo K12x">
+                <option value="Pixel/XL">
+                <option value="Pixel 2/XL">
+                <option value="Pixel 3/XL">
+                <option value="Pixel 3a/XL">
+                <option value="Pixel 4/XL">
+                <option value="Pixel 4a">
+                <option value="Pixel 4a (5G)">
+                <option value="Pixel 5">
+                <option value="Pixel 5a">
+                <option value="Pixel 6/Pro">
+                <option value="Pixel 6a">
+                <option value="Pixel 7/Pro">
+                <option value="Pixel 7a">
+                <option value="Pixel Fold">
+                <option value="Pixel 8/Pro">
+                <option value="Pixel 8a">
+                <option value="Pixel 9/Pro/Pro XL">
+                <option value="Xiaomi Pocophone F1">
+                <option value="POCO X2">
+                <option value="POCO F2 Pro">
+                <option value="POCO M2 Pro">
+                <option value="POCO X3 NFC">
+                <option value="POCO M2">
+                <option value="POCO X3">
+                <option value="POCO C3">
+                <option value="POCO M3">
+                <option value="POCO X3 Pro">
+                <option value="POCO F3">
+                <option value="POCO M2 Reloaded">
+                <option value="POCO M3 Pro">
+                <option value="POCO F3 GT">
+                <option value="POCO X3 GT">
+                <option value="POCO C31">
+                <option value="POCO M4 Pro 5G">
+                <option value="POCO M4 Pro">
+                <option value="POCO X4 Pro 5G">
+                <option value="POCO F4 GT">
+                <option value="POCO M4 5G">
+                <option value="POCO C40">
+                <option value="POCO X4 GT">
+                <option value="POCO F4">
+                <option value="POCO M5/M5s">
+                <option value="POCO C50">
+                <option value="POCO X5/Pro">
+                <option value="POCO C55">
+                <option value="POCO C51">
+                <option value="POCO F5/Pro">
+                <option value="POCO M6 Pro 5G">
+                <option value="POCO C65">
+                <option value="POCO M6 5G">
+                <option value="POCO M6 Pro/X6">
+                <option value="POCO X6 Pro">
+                <option value="POCO X6 Neo">
+                <option value="POCO C61">
+                <option value="POCO F6/Pro">
+                <option value="POCO M6">
+                <option value="Q Phone">
+                <option value="Razer Phone">
+                <option value="Razer Phone 2">
+                <option value="Realme 1">
+                <option value="Realme 2">
+                <option value="Realme C1">
+                <option value="Realme 2 Pro">
+                <option value="Realme U1">
+                <option value="Realme 3">
+                <option value="Realme C2">
+                <option value="Realme 3 Pro">
+                <option value="Realme X">
+                <option value="Realme 3i">
+                <option value="Realme 5">
+                <option value="Realme 5 Pro">
+                <option value="Realme XT">
+                <option value="Realme X2">
+                <option value="Realme X2 Pro">
+                <option value="Realme 5i">
+                <option value="Realme X50">
+                <option value="Realme C3">
+                <option value="Realme X50 Pro">
+                <option value="Realme 6/Pro">
+                <option value="Realme 6i">
+                <option value="Realme X50 Pro Player">
+                <option value="Realme X3 SuperZoom">
+                <option value="Realme Narzo">
+                <option value="Realme C3i">
+                <option value="Realme X3">
+                <option value="Realme C11">
+                <option value="Realme C15">
+                <option value="Realme V5">
+                <option value="Realme C12">
+                <option value="Realme V3">
+                <option value="Realme X7/Pro">
+                <option value="Realme 7 (Asia)/Pro">
+                <option value="Realme 7i">
+                <option value="Realme C17">
+                <option value="Realme Narzo 20/Pro/20A">
+                <option value="Realme 7 (Global)">
+                <option value="Realme Q2/Pro/2i">
+                <option value="Realme 7 5G">
+                <option value="Realme 7i (Global)">
+                <option value="Realme V15">
+                <option value="Realme C20">
+                <option value="Realme X7 (India)">
+                <option value="Realme V11">
+                <option value="Realme Narzo 30 Pro/30A">
+                <option value="Realme C21">
+                <option value="Realme GT">
+                <option value="Realme C25">
+                <option value="Realme 8/Pro">
+                <option value="Realme V13">
+                <option value="Realme GT Neo">
+                <option value="Realme X7 Pro Ultra">
+                <option value="Realme 8 5G">
+                <option value="Realme Q3/Pro/3i">
+                <option value="Realme C20A">
+                <option value="Realme narzo 30">
+                <option value="Realme GT Neo Flash">
+                <option value="Realme Q3 Pro Carnival">
+                <option value="Realme narzo 30 5G">
+                <option value="Realme X7 Max">
+                <option value="Realme C25s">
+                <option value="Realme C11 2021">
+                <option value="Realme C21Y">
+                <option value="Realme GT Master Edition">
+                <option value="Realme GT Explorer Master Edition">
+                <option value="Realme 8i/8s 5G">
+                <option value="Realme C25Y">
+                <option value="Realme GT Neo2">
+                <option value="Realme V11s">
+                <option value="Realme narzo 50A/50i">
+                <option value="Realme Q3s">
+                <option value="Realme GT Neo2T">
+                <option value="Realme Q3t">
+                <option value="Realme GT2/Pro">
+                <option value="Realme 9i">
+                <option value="Realme C35">
+                <option value="Realme 9 Pro/Pro+">
+                <option value="Realme narzo 50">
+                <option value="Realme V25">
+                <option value="Realme 9 5G (India)/5G Speed Edition">
+                <option value="Realme narzo 50A Prime">
+                <option value="Realme GT Neo3/150W">
+                <option value="Realme 9">
+                <option value="Realme Q5i">
+                <option value="Realme Q5/Pro">
+                <option value="Realme V23">
+                <option value="Realme narzo 50 5G/Pro">
+                <option value="Realme 9 5G">
+                <option value="Realme V20">
+                <option value="Realme GT Neo3T">
+                <option value="Realme C30">
+                <option value="Realme narzo 50i Prime">
+                <option value="Realme GT2 Explorer Master Edition">
+                <option value="Realme 9i 5G">
+                <option value="Realme C33">
+                <option value="Realme C30s">
+                <option value="Realme 10/5G">
+                <option value="Realme 10 Pro/Pro+">
+                <option value="Realme 10s">
+                <option value="Realme GT Neo5/240W">
+                <option value="Realme C55">
+                <option value="Realme V30/V30t">
+                <option value="Realme 10T">
+                <option value="Realme GT Neo5 SE">
+                <option value="Realme narzo N55">
+                <option value="Realme GT3">
+                <option value="Redmi 1">
+                <option value="Redmi 1S">
+                <option value="Redmi Note (3G)">
+                <option value="Redmi Note 4G">
+                <option value="Redmi 2">
+                <option value="Redmi 2A">
+                <option value="Redmi 2 Prime">
+                <option value="Redmi Note 2">
+                <option value="Redmi 2 Pro">
+                <option value="Redmi Note 3 (MTK)">
+                <option value="Redmi Note Prime">
+                <option value="Redmi 3">
+                <option value="Redmi Note 3/Pro">
+                <option value="Redmi 3 Pro">
+                <option value="Redmi 3S">
+                <option value="Redmi 3X">
+                <option value="Redmi 3S Prime">
+                <option value="Redmi Pro">
+                <option value="Redmi Note 4 (MTK)">
+                <option value="Redmi 4/Pro/Prime">
+                <option value="Redmi 4A">
+                <option value="Redmi Note 4/4X">
+                <option value="Redmi 4X">
+                <option value="Redmi Note 5A/Prime">
+                <option value="Redmi 5A">
+                <option value="Redmi 5/Plus">
+                <option value="Redmi Note 5 Pro">
+                <option value="Redmi Note 5">
+                <option value="Redmi S2/Y2">
+                <option value="Redmi 6/6A/Pro">
+                <option value="Redmi Note 6 Pro">
+                <option value="Redmi Note 7">
+                <option value="Redmi Go">
+                <option value="Redmi Note 7 Pro">
+                <option value="Redmi 7">
+                <option value="Redmi Y3">
+                <option value="Redmi 7A">
+                <option value="Redmi K20/Pro">
+                <option value="Redmi Note 8/Pro">
+                <option value="Redmi 8A">
+                <option value="Redmi 8">
+                <option value="Redmi Note 8T">
+                <option value="Redmi K30/5G">
+                <option value="Redmi 8A Dual">
+                <option value="Redmi Note 9 Pro (India)/Pro Max/9S">
+                <option value="Redmi K30 Pro/Pro Zoom">
+                <option value="Redmi Note 9/Pro (Global)">
+                <option value="Redmi 10X/Pro">
+                <option value="Redmi 9">
+                <option value="Redmi 9A">
+                <option value="Redmi 9C">
+                <option value="Redmi 9 Prime">
+                <option value="Redmi K30 Ultra">
+                <option value="Redmi K30S Ultra">
+                <option value="Redmi Note 9 4G/5G/Pro 5G">
+                <option value="Redmi 9 Power">
+                <option value="Redmi 9T">
+                <option value="Redmi Note 9T">
+                <option value="Redmi K40/Pro/Pro+">
+                <option value="Redmi Note 10/Pro/Pro Max">
+                <option value="Redmi Note 10S/5G">
+                <option value="Redmi K40 Gaming">
+                <option value="Redmi Note 8 2021">
+                <option value="Redmi Note 10 Pro 5G">
+                <option value="Redmi Note 10T">
+                <option value="Redmi Note 10 JE">
+                <option value="Redmi 10">
+                <option value="Redmi 10 Prime">
+                <option value="Redmi 9 Activ">
+                <option value="Redmi 9A Sport/9i Sport">
+                <option value="Redmi Note 10 Lite">
+                <option value="Redmi Note 11 5G/Pro (China)/Pro+ 5G">
+                <option value="Redmi Note 11 4G">
+                <option value="Redmi Note 11T">
+                <option value="Redmi Note 11/11S">
+                <option value="Redmi Note 11 Pro/11 Pro 5G">
+                <option value="Redmi K50G">
+                <option value="Redmi Note 11E">
+                <option value="Redmi Note 11E Pro">
+                <option value="Redmi Note 11 Pro+ (India)">
+                <option value="Redmi 10 (India)">
+                <option value="Redmi 10C">
+                <option value="Redmi K40S">
+                <option value="Redmi K50/Pro">
+                <option value="Redmi 10A">
+                <option value="Redmi Note 11S 5G">
+                <option value="Redmi 10 Power">
+                <option value="Redmi 10 2022">
+                <option value="Redmi 10 Prime 2022">
+                <option value="Redmi Note 11SE">
+                <option value="Redmi Note 11T Pro/Pro+">
+                <option value="Redmi 10 5G">
+                <option value="Redmi K50i">
+                <option value="Redmi K50 Ultra">
+                <option value="Redmi Note 11 SE">
+                <option value="Redmi A1/+">
+                <option value="Redmi 11 Prime/Prime 5G">
+                <option value="Redmi Note 11R">
+                <option value="Redmi Note 12 5G (China)/Pro 5G/Pro+/Discovery Edition">
+                <option value="Redmi Note 12 Pro Speed Edition">
+                <option value="Redmi K60E">
+                <option value="Redmi K60/Pro">
+                <option value="Redmi 12C">
+                <option value="Redmi Note 12 5G">
+                <option value="Redmi A2/+">
+                <option value="Redmi Note 12">
+                <option value="Redmi Note 12 Turbo">
+                <option value="Redmi Note 12 Pro">
+                <option value="Redmi Note 12S">
+                <option value="Redmi Note 12R Pro">
+                <option value="Redmi Note 12T Pro">
+                <option value="Redmi 12">
+                <option value="Redmi Note 12R">
+                <option value="Redmi 12 5G">
+                <option value="Redmi K60 Ultra">
+                <option value="Redmi Note 13 5G (China)/Pro 5G/Pro+">
+                <option value="Redmi 13C">
+                <option value="Redmi Note 13R Pro">
+                <option value="Redmi K70/Pro/K70E">
+                <option value="Redmi 13C 5G">
+                <option value="Redmi 12R/13R">
+                <option value="Redmi Note 13/5G/Pro">
+                <option value="Redmi A3">
+                <option value="Redmi Turbo 3">
+                <option value="Redmi Note 13R">
+                <option value="Redmi A3x">
+                <option value="Redmi 13">
+                <option value="Samsung Galaxy">
+                <option value="Samsung Galaxy S1">
+                <option value="Samsung Galaxy S2">
+                <option value="Samsung Galaxy Xcover">
+                <option value="Samsung Galaxy Note">
+                <option value="Samsung Galaxy Y DUOS">
+                <option value="Samsung Galaxy S3">
+                <option value="Samsung Galaxy Beam">
+                <option value="Samsung Galaxy Note 2">
+                <option value="Samsung Galaxy Xcover 2">
+                <option value="Samsung Galaxy S4">
+                <option value="Samsung Galaxy S4 Zoom">
+                <option value="Samsung Galaxy Note 3">
+                <option value="Samsung Galaxy Note 3 Neo">
+                <option value="Samsung Galaxy S5">
+                <option value="Samsung Galaxy Beam 2">
+                <option value="Samsung Galaxy Alpha">
+                <option value="Samsung Galaxy Grand Prime">
+                <option value="Samsung Galaxy Note 4">
+                <option value="Samsung Galaxy Note Edge">
+                <option value="Samsung Galaxy A5 Duos">
+                <option value="Samsung Galaxy A5">
+                <option value="Samsung Galaxy A3/Duos">
+                <option value="Samsung Galaxy E7">
+                <option value="Samsung Galaxy A7/Duos">
+                <option value="Samsung Galaxy S6/Edge">
+                <option value="Samsung Galaxy Xcover 3">
+                <option value="Samsung Galaxy A8/Duos">
+                <option value="Samsung Galaxy Note 5">
+                <option value="Samsung Galaxy S6 Edge+">
+                <option value="Samsung Galaxy A3 (2016)/A5 (2016)/A7 (2016)">
+                <option value="Samsung Galaxy A9 (2016)">
+                <option value="Samsung Galaxy J1 (2016)/Express 3/Amp 2">
+                <option value="Samsung Galaxy S7/Edge">
+                <option value="Samsung Galaxy Xcover 3 G389F">
+                <option value="Samsung Galaxy A9 Pro (2016)">
+                <option value="Samsung Galaxy C7">
+                <option value="Samsung Galaxy Note 7">
+                <option value="Samsung Galaxy A8 (2016)">
+                <option value="Samsung Galaxy C9 Pro">
+                <option value="Samsung Galaxy A3 (2017)/A5 (2017)/A7 (2017)">
+                <option value="Samsung Galaxy Xcover 4">
+                <option value="Samsung Galaxy S8/+">
+                <option value="Samsung Galaxy Note FE">
+                <option value="Samsung Galaxy Note 8">
+                <option value="Samsung Galaxy C8">
+                <option value="Samsung Galaxy C5">
+                <option value="Samsung Galaxy A8 (2018)/+">
+                <option value="Samsung Galaxy S9/+">
+                <option value="Samsung Galaxy A6/+">
+                <option value="Samsung Galaxy A8 Star">
+                <option value="Samsung Galaxy Note 9">
+                <option value="Samsung Galaxy A7 (2018)">
+                <option value="Samsung Galaxy A9 (2018)">
+                <option value="Samsung Galaxy A6s">
+                <option value="Samsung Galaxy A8s">
+                <option value="Samsung Galaxy A10">
+                <option value="Samsung Galaxy A30">
+                <option value="Samsung Galaxy A50">
+                <option value="Samsung Galaxy S10/e/+">
+                <option value="Samsung Galaxy S10 5G">
+                <option value="Samsung Galaxy A20/A40">
+                <option value="Samsung Galaxy A2 Core">
+                <option value="Samsung Galaxy A20e">
+                <option value="Samsung Galaxy A70">
+                <option value="Samsung Galaxy A80">
+                <option value="Samsung Galaxy A60">
+                <option value="Samsung Galaxy Xcover 4s">
+                <option value="Samsung Galaxy A10e">
+                <option value="Samsung Galaxy Note 10/+">
+                <option value="Samsung Galaxy A10s">
+                <option value="Samsung Galaxy A30s/A50s">
+                <option value="Samsung Galaxy A90 5G">
+                <option value="Samsung Galaxy A70s">
+                <option value="Samsung Galaxy Z Fold">
+                <option value="Samsung Galaxy A20s">
+                <option value="Samsung Galaxy A51/A71">
+                <option value="Samsung Galaxy A01">
+                <option value="Samsung Galaxy Xcover Pro">
+                <option value="Samsung Galaxy Z Flip">
+                <option value="Samsung Galaxy S20/+/Ultra">
+                <option value="Samsung Galaxy Xcover FieldPro">
+                <option value="Samsung Galaxy A31">
+                <option value="Samsung Galaxy A11">
+                <option value="Samsung Galaxy A41">
+                <option value="Samsung Galaxy A51 5G/A71 5G">
+                <option value="Samsung Galaxy A21">
+                <option value="Samsung Galaxy A21s">
+                <option value="Samsung Galaxy A71 5G UW">
+                <option value="Samsung Galaxy Z Flip 5G">
+                <option value="Samsung Galaxy Note 20/Ultra">
+                <option value="Samsung Galaxy Z Fold 2">
+                <option value="Samsung Galaxy A01 Core">
+                <option value="Samsung Galaxy A51 5G UW">
+                <option value="Samsung Galaxy A42 5G">
+                <option value="Samsung Galaxy S20 FE">
+                <option value="Samsung Galaxy F41">
+                <option value="Samsung Galaxy M21s">
+                <option value="Samsung Galaxy A12">
+                <option value="Samsung Galaxy A02s/M02s">
+                <option value="Samsung Galaxy A32 5G">
+                <option value="Samsung Galaxy S21">
+                <option value="Samsung Galaxy S21+">
+                <option value="Samsung Galaxy S21 Ultra">
+                <option value="Samsung Galaxy S24 Ultra">
+                <option value="Samsung Galaxy A02">
+                <option value="Samsung Galaxy M02">
+                <option value="Samsung Galaxy M12">
+                <option value="Samsung Galaxy F62">
+                <option value="Samsung Galaxy M62">
+                <option value="Samsung Galaxy A32">
+                <option value="Samsung Galaxy Xcover 5">
+                <option value="Samsung Galaxy A52/A52 5G">
+                <option value="Samsung Galaxy A72">
+                <option value="Samsung Galaxy F02s">
+                <option value="Samsung Galaxy F12">
+                <option value="Samsung Galaxy Quantum 2">
+                <option value="Samsung Galaxy F52 5G">
+                <option value="Samsung Galaxy M32">
+                <option value="Samsung Galaxy A22/A22 5G">
+                <option value="Samsung Galaxy Z Fold 3/Z Flip 3">
+                <option value="Samsung Galaxy M52 5G">
+                <option value="Samsung Galaxy XCover 6 Pro">
+                <option value="Samsung Galaxy XCover 7">
+                <option value="Samsung Galaxy XCover 7 Pro">
+                <option value="Vivo X1">
+                <option value="Vivo X3">
+                <option value="Vivo X3S">
+                <option value="Vivo X5/Max">
+                <option value="Vivo X5Max+">
+                <option value="Vivo X5Pro">
+                <option value="Vivo X5Max Platinum">
+                <option value="Vivo V1">
+                <option value="Vivo V1 Max">
+                <option value="Vivo X6/Plus">
+                <option value="Vivo X6S/Plus">
+                <option value="Vivo V3/Max">
+                <option value="Vivo X7/Plus">
+                <option value="Vivo X9/Plus">
+                <option value="Vivo V5">
+                <option value="Vivo V5 Plus">
+                <option value="Vivo V5 Lite/Y66">
+                <option value="Vivo V5s">
+                <option value="Vivo X9s/Plus">
+                <option value="Vivo V7+">
+                <option value="Vivo X20/Plus">
+                <option value="Vivo V7">
+                <option value="Vivo X20 Plus UD">
+                <option value="Vivo X21/UD">
+                <option value="Vivo V9/Youth">
+                <option value="Vivo X21i">
+                <option value="Vivo NEX">
+                <option value="Vivo V11">
+                <option value="Vivo X23">
+                <option value="Vivo V11i">
+                <option value="Vivo NEX Dual Display">
+                <option value="Vivo V15/Pro">
+                <option value="Vivo X27/Pro">
+                <option value="Vivo V17 Neo">
+                <option value="Vivo NEX 3">
+                <option value="Vivo V17 Pro">
+                <option value="Vivo V17">
+                <option value="Vivo X30/Pro">
+                <option value="Vivo NEX 3S">
+                <option value="vivo Z5">
+                <option value="vivo Z6 5G">
+                <option value="Vivo V19">
+                <option value="Vivo X50 Lite">
+                <option value="Vivo X50/Pro/Pro+">
+                <option value="Vivo V19 Neo">
+                <option value="Vivo V20 Pro">
+                <option value="Vivo X50e">
+                <option value="Vivo V20 SE">
+                <option value="Vivo V20">
+                <option value="Vivo X51">
+                <option value="Vivo V20 (2021)">
+                <option value="Vivo X60/Pro/Pro+">
+                <option value="vivo Y12s">
+                <option value="vivo Y1s">
+                <option value="vivo Y20">
+                <option value="vivo V21/V21e">
+                <option value="vivo Y53s">
+                <option value="vivo S10">
+                <option value="Vivo X70/Pro/Pro+">
+                <option value="vivo V23e">
+                <option value="vivo V23e 5G">
+                <option value="vivo Y21T">
+                <option value="vivo Y33t">
+                <option value="vivo Y55 5G">
+                <option value="vivo Y75 5G">
+                <option value="vivo V23/Pro">
+                <option value="Vivo Y21a">
+                <option value="Vivo Y01">
+                <option value="Vivo Y21G">
+                <option value="Vivo X80/Pro">
+                <option value="Vivo X Note/Fold">
+                <option value="Vivo X Fold+">
+                <option value="Vivo X90/Pro/Pro+">
+                <option value="Vivo X Fold2/Flip">
+                <option value="Vivo X90s">
+                <option value="Vivo X100/Pro">
+                <option value="Vivo Y100i">
+                <option value="Vivo Y36i">
+                <option value="Vivo S18/Pro/e">
+                <option value="Wickedleak Wammy Passion X">
+                <option value="Xiaomi Mi 1">
+                <option value="Xiaomi Mi 1S">
+                <option value="Xiaomi Mi 2">
+                <option value="Xiaomi Mi 2S/A">
+                <option value="Xiaomi Mi 3/TD">
+                <option value="Xiaomi Mi 4">
+                <option value="Xiaomi Mi Note">
+                <option value="Xiaomi Mi Note Pro">
+                <option value="Xiaomi Mi 4i">
+                <option value="Xiaomi Mi 4c">
+                <option value="Xiaomi Mi 4S">
+                <option value="Xiaomi Mi 5">
+                <option value="Xiaomi Mi Max/Pro">
+                <option value="Xiaomi Mi 5s/Plus">
+                <option value="Xiaomi Mi Note 2">
+                <option value="Xiaomi Mi MIX">
+                <option value="Xiaomi Mi 5c">
+                <option value="Xiaomi Mi 6">
+                <option value="Xiaomi Mi Max 2">
+                <option value="Xiaomi Mi 5X/Mi A1">
+                <option value="Xiaomi Mi Note 3">
+                <option value="Xiaomi Mi MIX 2">
+                <option value="Xiaomi Mi MIX 2S">
+                <option value="Xiaomi Mi 6X/Mi A2">
+                <option value="Xiaomi Mi 8/SE/EE">
+                <option value="Xiaomi Mi Max 3">
+                <option value="Xiaomi Mi 8 Pro/Lite">
+                <option value="Xiaomi Mi MIX 3">
+                <option value="Xiaomi Mi Play">
+                <option value="Xiaomi Mi 9/SE">
+                <option value="Xiaomi Mi MIX 3 5G">
+                <option value="Xiaomi Mi 9T">
+                <option value="Xiaomi Mi A3">
+                <option value="Xiaomi Mi 9T Pro">
+                <option value="Xiaomi Mi 9 Lite">
+                <option value="Xiaomi Mi 9 Pro">
+                <option value="Xiaomi Mi Note 10/Pro">
+                <option value="Xiaomi Mi 10/Pro">
+                <option value="Xiaomi Mi 10 Lite">
+                <option value="Xiaomi Mi 10 Youth">
+                <option value="Xiaomi Mi Note 10 Lite">
+                <option value="Xiaomi Mi 10 Ultra">
+                <option value="Xiaomi Mi 10T/Pro/Lite">
+                <option value="Xiaomi Mi 11">
+                <option value="Xiaomi Mi 10i">
+                <option value="Xiaomi Mi 10S">
+                <option value="Xiaomi Mi 11 Pro/Ultra/11i">
+                <option value="Xiaomi Mi 11 Lite/Lite 5G">
+                <option value="Xiaomi Mi MIX Fold">
+                <option value="Xiaomi Mi 11X/Pro">
+                <option value="Xiaomi MIX 4">
+                <option value="Xiaomi 11T/Pro">
+                <option value="Xiaomi 11 Lite 5G NE">
+                <option value="Xiaomi 12/Pro/X">
+                <option value="Xiaomi 11i/HyperCharge">
+                <option value="Xiaomi Civi 1S">
+                <option value="Xiaomi 12 Pro Dimensity">
+                <option value="Xiaomi 12S/Pro/Ultra">
+                <option value="Xiaomi 12 Lite">
+                <option value="Xiaomi MIX Fold 2">
+                <option value="Xiaomi Civi 2">
+                <option value="Xiaomi 12T/Pro">
+                <option value="Xiaomi 13/Pro">
+                <option value="Xiaomi 13 Lite">
+                <option value="Xiaomi 13 Ultra">
+                <option value="Xiaomi Civi 3">
+                <option value="Xiaomi MIX Fold 3">
+                <option value="Xiaomi 13T/Pro">
+                <option value="Xiaomi 14/Pro">
+                <option value="Xiaomi 14 Ultra">
+                <option value="Xiaomi Civi 4 Pro">
+                <option value="Xiaomi 14 Civi">
+                <option value="Xiaomi 14T/Pro">
+                <option value="Xiaomi 15/Pro">
+                <option value="Xiaomi 15 Ultra">
+                <option value="Xiaomi 15S Pro">
+                <option value="Xiaomi Civi 5 Pro">
+                </datalist>
+
+            <label>Price (₹):</label><br>
+            <input type="number" id="price"><br><br>
+
+            <label>Storage:</label><br>
+            <input type="text" id="storage" placeholder="6GB / 128GB"><br><br>
+
+            <label>Color:</label><br>
+            <input type="text" id="color"><br><br>
+
+            <button onclick="savePurchase()">💾 Save Purchase</button>
+        </div>
+    </div>
+
+    <script>
+        // Modal open/close
+        function openModal() {
+            document.getElementById("purchaseModal").style.display = "flex";
+        }
+        function closeModal() {
+            document.getElementById("purchaseModal").style.display = "none";
+        }
+
+        // Show/hide conditional fields based on source (Renamed from toggleKnownPerson for clarity)
+        function togglePurchaseDetails() {
+            const source = document.getElementById("purchaseSource").value;
+            
+            // Hide all conditional fields first
+            document.getElementById("knownPersonField").style.display = "none";
+            document.getElementById("cashifyDetails").style.display = "none";
+            document.getElementById("customerDetails").style.display = "none";
+
+            // Show the relevant field
+            if (source === "Known Person") {
+                document.getElementById("knownPersonField").style.display = "block";
+            } else if (source === "Cashify") {
+                document.getElementById("cashifyDetails").style.display = "block";
+            } else if (source === "Customer") {
+                document.getElementById("customerDetails").style.display = "block";
+            }
+        }
+
+        // Save Purchase (updated to handle all fields)
+        function savePurchase() {
+            const source = document.getElementById("purchaseSource").value;
+            const imei = document.getElementById("imei").value;
+            const model = document.getElementById("model").value;
+            const price = document.getElementById("price").value;
+            const storage = document.getElementById("storage").value;
+            const color = document.getElementById("color").value;
+            
+            let extraDetails = "";
+
+            if (source === "Known Person") {
+                const name = document.getElementById("knownName").value;
+                extraDetails = `Known Person Name: ${name}`;
+            } else if (source === "Cashify") {
+                const invoiceNo = document.getElementById("invoiceNo").value;
+                const purchaseDate = document.getElementById("purchaseDate").value;
+                extraDetails = `Invoice No: ${invoiceNo}\nDate: ${purchaseDate}`;
+            } else if (source === "Customer") {
+                const name = document.getElementById("customerName").value;
+                const phone = document.getElementById("customerPhone").value;
+                const idDetails = document.getElementById("idCardDetails").value;
+                
+                // Handle file upload for display only in this demo
+                const idPicFile = document.getElementById("idCardPic").files[0];
+                const idPic = idPicFile ? idPicFile.name : 'No file selected';
+                
+                // IMPORTANT: For a real application, you need to use JavaScript/API to upload this file to a server (like Google Drive or a custom backend)
+                // The current code only displays the file name, it does *not* upload the file.
+
+                extraDetails = `Customer Name: ${name}\nPhone: ${phone}\nID Details: ${idDetails}\nID Pic: ${idPic}`;
+            }
+
+            if (!source || !imei || !model) {
+                alert("Please fill all required fields!");
+                return;
+            }
+
+            alert(`Purchase Saved:\nSource: ${source}\n--- Extra Details ---\n${extraDetails}\n------------------\nIMEI: ${imei}\nModel: ${model}\nPrice: ₹${price}\nStorage: ${storage}\nColor: ${color}`);
+            closeModal();
+            // Clear the form fields after successful save (optional, but good practice)
+            document.getElementById("purchaseForm").reset();
+
+        }
+    </script>
+
+</body>
+</html>

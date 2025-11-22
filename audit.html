@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NV Stock — Stock Audit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        h2 {
+            color: #0ea5e9;
+            margin-bottom: 30px;
+        }
+        .scanner-box {
+            background: #1e293b;
+            padding: 40px 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            box-shadow: 0 0 20px rgba(0, 165, 233, 0.4);
+            border: 2px solid #0ea5e9;
+        }
+        input[type="text"] {
+            width: 90%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #0ea5e9;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+        }
+        button {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #38bdf8;
+        }
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-height: 50px;
+            text-align: left;
+        }
+        .status-success { background: #10b981; color: white; }
+        .status-sold { background: #f59e0b; color: white; }
+        .status-error { background: #ef4444; color: white; }
+        .audit-list-container {
+            margin-top: 20px;
+            text-align: left;
+            padding: 15px;
+            border: 1px solid #334455;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #1e293b;
+        }
+        .back-link { display: inline-block; margin-top: 30px; color: #0ea5e9; text-decoration: none; }
+        .audit-entry { padding: 8px 0; border-bottom: 1px dashed #334455; list-style: none; }
+    </style>
+</head>
+<body>
+    <a class="back-link" href="{{ url_for('index') }}">← Back to Dashboard</a>
+    <h2>🔍 Live Stock Audit (IMEI Scan)</h2>
+
+    <div class="scanner-box">
+        <label for="imeiScanInput" style="display: block; margin-bottom: 10px;">**Scan or Enter IMEI:**</label>
+        <input type="text" id="imeiScanInput" placeholder="IMEI will appear here..." autofocus maxlength="20">
+        <button onclick="checkAuditStatus()">Check Status (Manual)</button>
+        <div id="feedback">Awaiting first scan...</div>
+    </div>
+
+    <h3>📝 Audited Items in this Session:</h3>
+    <div class="audit-list-container">
+        <ul id="auditedList"></ul>
+    </div>
+
+    <button style="margin-top: 20px;" onclick="window.location='/export_audit'">Export Audit Report (Excel)</button>
+
+    <script>
+        const imeiInput = document.getElementById('imeiScanInput');
+        const auditedItems = [];
+
+        async function fetchInventory() {
+            const resp = await fetch("/api/inventory");
+            const data = await resp.json();
+            return data.map(row => ({
+                imei: row[0], product: row[1], company: row[2], model: row[3],
+                spec: row[4], purchaseDate: row[5], receivedFrom: row[6],
+                status: row[8], soldTo: row[9], soldDate: row[10]
+            }));
+        }
+
+        let inventoryData = [];
+        fetchInventory().then(data => inventoryData = data);
+
+        function checkAuditStatus() {
+            const imei = imeiInput.value.trim();
+            const feedbackBox = document.getElementById('feedback');
+            const auditedList = document.getElementById('auditedList');
+            const auditDate = new Date().toLocaleString('en-IN');
+
+            if (!imei) { feedbackBox.className='status-error'; feedbackBox.innerHTML='Please enter IMEI.'; return; }
+
+            const item = inventoryData.find(i => i.imei === imei);
+
+            feedbackBox.className = ''; // reset
+            let auditStatus = '';
+
+            if (item) {
+                if (item.status === 'In Stock') {
+                    feedbackBox.className='status-success';
+                    feedbackBox.innerHTML = `✅ AUDITED! ${item.model} (${imei}) is IN STOCK. Date: ${auditDate}.`;
+                    auditStatus = "Audited – Found";
+                } else if (item.status === 'Sold') {
+                    feedbackBox.className='status-sold';
+                    feedbackBox.innerHTML = `⚠️ SOLD! ${item.model} (${imei}) was SOLD on ${item.soldDate}.`;
+                    auditStatus = "Sold – Found";
+                }
+
+                // Log to backend
+                fetch("/log_audit", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        imei: imei,
+                        status: auditStatus,
+                        model: item.model,
+                        audit_date: auditDate
+                    })
+                });
+
+                if (!auditedItems.some(a => a.imei === imei)) {
+                    auditedItems.push({imei, model: item.model, status: auditStatus, audit_date: auditDate});
+                    const li = document.createElement('li');
+                    li.className = 'audit-entry';
+                    li.innerHTML = `✅ ${imei} - ${item.model} (${auditStatus}, Audited: ${auditDate})`;
+                    auditedList.prepend(li);
+                }
+            } else {
+                feedbackBox.className='status-error';
+                feedbackBox.innerHTML = `❌ NOT FOUND! IMEI ${imei} is NOT IN STOCK.`;
+            }
+
+            imeiInput.value = '';
+            imeiInput.focus();
+        }
+
+        imeiInput.addEventListener('keypress', e => { if(e.key==='Enter'){ e.preventDefault(); checkAuditStatus(); } });
+
+        let inputTimeout;
+        imeiInput.addEventListener('input', () => {
+            clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => {
+                if (imeiInput.value.trim().length > 0) checkAuditStatus();
+            }, 200);
+        });
+    </script>
+</body>
+</html>
